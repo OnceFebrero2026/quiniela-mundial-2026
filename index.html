@@ -5,252 +5,709 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gran Quiniela Mundial 2026</title>
     <style>
-        :root { --primary: #1a472a; --gold: #c9a03d; --light: #f4f6f5; }
+        :root {
+            --primary: #1a472a;
+            --gold: #c9a03d;
+            --gold-light: #e8c56a;
+            --light: #f4f6f5;
+            --dark-bg: #0d2818;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: #0d2818; color: #333; padding: 20px; }
+        body { background: var(--dark-bg); color: #333; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; background: var(--light); border-radius: 15px; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.5); }
+
+        /* Header */
         .header { background: linear-gradient(135deg, var(--primary), #000); color: white; padding: 30px; text-align: center; border-bottom: 5px solid var(--gold); }
         .header h1 { font-size: 2.5rem; text-transform: uppercase; letter-spacing: 2px; }
-        .step-container { padding: 30px; display: none; animation: fadeIn 0.5s; }
+        .header p { margin-top: 8px; opacity: 0.85; }
+
+        /* Steps nav */
+        .steps-nav { display: flex; background: #1a472a; }
+        .step-tab { flex: 1; padding: 14px 5px; text-align: center; color: rgba(255,255,255,0.5); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; border-right: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
+        .step-tab:last-child { border-right: none; }
+        .step-tab.active { color: #fff; background: rgba(201,160,61,0.3); border-bottom: 3px solid var(--gold); }
+        .step-tab.completed { color: var(--gold-light); }
+
+        /* Step containers */
+        .step-container { padding: 30px; display: none; animation: fadeIn 0.4s; }
         .step-container.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Grid de Grupos */
-        .groups-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Group grid */
+        .groups-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 20px; }
         .group-card { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--gold); }
-        .group-card h3 { text-align: center; color: var(--primary); margin-bottom: 15px; }
-        .match-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-        .match-row input { width: 50px; text-align: center; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-weight: bold; }
-        
-        /* Fase Final y Premios */
-        .special-section { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .group-card h3 { text-align: center; color: var(--primary); margin-bottom: 12px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .match-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; gap: 6px; }
+        .match-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .team-name { flex: 1; font-size: 0.82rem; font-weight: 600; color: #444; }
+        .team-name.right { text-align: right; }
+        .score-input { width: 42px; padding: 5px 4px; border: 1px solid #ccc; border-radius: 6px; font-weight: bold; font-size: 0.9rem; text-align: center; color: var(--primary); transition: border-color 0.2s; }
+        .score-input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 2px rgba(201,160,61,0.2); }
+        .score-sep { font-weight: bold; color: #999; font-size: 0.9rem; }
+
+        /* Knockout bracket */
+        .knockout-section { margin-bottom: 30px; }
+        .knockout-section h2 { color: var(--primary); border-bottom: 3px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
+        .bracket-grid { display: grid; gap: 10px; }
+        .bracket-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .bracket-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+        .bracket-grid.cols-8 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+        .bracket-match { background: white; border-radius: 10px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border-left: 4px solid var(--gold); }
+        .bracket-match .match-label { font-size: 0.7rem; text-transform: uppercase; color: #999; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .bracket-match .team-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+        .bracket-match .team-row:last-child { margin-bottom: 0; }
+        .team-pill { flex: 1; background: #f0f4f2; border-radius: 6px; padding: 7px 10px; font-size: 0.82rem; font-weight: 600; color: #333; min-height: 32px; display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .team-pill.auto { color: var(--primary); background: #e8f5ee; }
+        .ko-score { width: 40px; padding: 5px 4px; border: 1.5px solid #ccc; border-radius: 6px; font-weight: bold; font-size: 0.85rem; text-align: center; color: var(--primary); }
+        .ko-score:focus { border-color: var(--gold); outline: none; }
+
+        /* Penalty winner selector — aparece solo en empate */
+        .pen-selector { display: none; margin-top: 10px; background: #fff8e1; border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 12px; }
+        .pen-selector.visible { display: block; }
+        .pen-selector p { font-size: 0.75rem; font-weight: 700; color: #7a5800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .pen-selector .pen-btns { display: flex; gap: 8px; }
+        .pen-btn { flex: 1; padding: 8px 6px; border: 2px solid #ddd; border-radius: 7px; background: white; font-size: 0.8rem; font-weight: 700; color: #444; cursor: pointer; transition: all 0.2s; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pen-btn:hover { border-color: var(--gold); color: var(--primary); }
+        .pen-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Winner banner */
+        .winner-banner { margin-top: 8px; font-size: 0.78rem; font-weight: 700; color: var(--primary); min-height: 18px; display: flex; align-items: center; gap: 5px; }
+        .winner-banner.has-winner::before { content: '✓'; color: #28a745; }
+        .bracket-match .team-row.winner-row .team-pill { background: #d4edda; color: #155724; }
+
+        /* Special sections */
+        .special-section { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .special-section h2 { color: var(--primary); border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
-        
-        /* Formulario Registro */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
         .input-group { display: flex; flex-direction: column; }
-        .input-group label { font-weight: bold; margin-bottom: 5px; color: var(--primary); }
-        .input-group input { padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; }
+        .input-group label { font-weight: bold; margin-bottom: 5px; color: var(--primary); font-size: 0.9rem; }
+        .input-group input { padding: 11px 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; transition: border-color 0.2s; }
         .input-group input:focus { border-color: var(--gold); outline: none; }
-        
+
+        /* Notification */
+        .info-note { background: #fff9e6; border-left: 4px solid var(--gold); padding: 12px 15px; border-radius: 0 8px 8px 0; margin-bottom: 20px; font-size: 0.88rem; color: #6b5000; }
+
+        /* Buttons */
         .btn-panel { display: flex; justify-content: space-between; padding: 20px 30px; background: #e9ecef; border-top: 1px solid #ddd; }
-        .btn { padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn { padding: 11px 28px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: all 0.25s; }
+        .btn-back { background: #ccc; color: #444; }
+        .btn-back:hover { background: #bbb; }
         .btn-next { background: var(--gold); color: var(--primary); }
-        .btn-next:hover { background: #b8860b; transform: scale(1.05); }
-        .btn-submit { background: var(--primary); color: white; width: 100%; margin-top: 20px; font-size: 1.3rem; }
-        .btn-submit:hover { background: #0a1f12; }
+        .btn-next:hover { background: #b8860b; transform: scale(1.04); }
+        .btn-submit { background: var(--primary); color: white; width: 100%; margin-top: 20px; font-size: 1.2rem; padding: 15px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; transition: all 0.25s; }
+        .btn-submit:hover { background: #0a1f12; transform: scale(1.02); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* Octavos list */
+        .classified-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
+        .classified-item { background: #f0f4f2; border-radius: 8px; padding: 9px 12px; font-size: 0.85rem; font-weight: 600; color: var(--primary); border: 1px solid #dde8e2; display: flex; align-items: center; gap: 6px; }
+        .classified-item .rank { background: var(--gold); color: #fff; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; flex-shrink: 0; }
+        .classified-item .pos { font-size: 0.72rem; color: #888; margin-left: auto; }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.6rem; }
+            .step-tab { font-size: 0.65rem; padding: 10px 3px; }
+            .bracket-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+            .bracket-grid.cols-2 { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏆 Quiniela Mundial 2026</h1>
-            <p>Acierta los resultados, acumula puntos y lidera el ranking</p>
-        </div>
+<div class="container">
+    <div class="header">
+        <h1>🏆 Quiniela Mundial 2026</h1>
+        <p>Acierta los resultados, acumula puntos y lidera el ranking</p>
+    </div>
 
-        <div id="step1" class="step-container active">
-            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Paso 1: Fase de Grupos</h2>
-            <div id="groups-wrapper" class="groups-grid"></div>
-            <div class="btn-panel" style="justify-content: flex-end;">
-                <button class="btn btn-next" onclick="nextStep(2)">Siguiente: Fase Final ➔</button>
-            </div>
-        </div>
+    <div class="steps-nav">
+        <div class="step-tab active" id="tab1" onclick="goStep(1)">1. Grupos</div>
+        <div class="step-tab" id="tab2" onclick="goStep(2)">2. Dieciseisavos</div>
+        <div class="step-tab" id="tab3" onclick="goStep(3)">3. Octavos</div>
+        <div class="step-tab" id="tab4" onclick="goStep(4)">4. Cuartos</div>
+        <div class="step-tab" id="tab5" onclick="goStep(5)">5. Semis & Final</div>
+        <div class="step-tab" id="tab6" onclick="goStep(6)">6. Premios</div>
+        <div class="step-tab" id="tab7" onclick="goStep(7)">7. Registro</div>
+    </div>
 
-        <div id="step2" class="step-container">
-            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Paso 2: Eliminatorias y Premios</h2>
-            
-            <div class="special-section">
-                <h2>🏅 Clasificados a Octavos (Elige 16 equipos - 2 pts c/u)</h2>
-                <textarea id="octavos" rows="3" style="width: 100%; padding: 10px; border-radius: 8px;" placeholder="Ej: Brasil, Argentina, Francia, España..."></textarea>
-            </div>
-
-            <div class="special-section">
-                <h2>🏆 El Gran Campeón (10 pts)</h2>
-                <div class="input-group">
-                    <input type="text" id="campeon" placeholder="¿Qué país levantará la copa?">
-                    <label style="margin-top: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" id="penalesCampeon" style="width: auto;"> 
-                        Ganará en tanda de penales (2 pts extra)
-                    </label>
-                </div>
-            </div>
-
-            <div class="special-section">
-                <h2>🌟 Premios Individuales (5 pts c/u)</h2>
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label>Bota de Oro (Máximo Goleador)</label>
-                        <input type="text" id="botaOro" placeholder="Nombre del jugador">
-                    </div>
-                    <div class="input-group">
-                        <label>Balón de Oro (Mejor Jugador / MVP)</label>
-                        <input type="text" id="mvp" placeholder="Nombre del jugador">
-                    </div>
-                </div>
-            </div>
-
-            <div class="btn-panel">
-                <button class="btn" style="background: #ccc;" onclick="nextStep(1)">🡄 Volver</button>
-                <button class="btn btn-next" onclick="nextStep(3)">Siguiente: Tus Datos ➔</button>
-            </div>
-        </div>
-
-        <div id="step3" class="step-container">
-            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Paso 3: Registro Oficial</h2>
-            <div class="special-section">
-                <p style="margin-bottom: 20px; text-align: center;">Tus pronósticos están listos. Registra tus datos para guardar la quiniela en la base de datos oficial. <strong>Solo se permite un registro por cédula.</strong></p>
-                
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label>Nombre y Apellido *</label>
-                        <input type="text" id="nombre" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Cédula de Identidad *</label>
-                        <input type="text" id="cedula" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Gerencia / Unidad *</label>
-                        <input type="text" id="gerencia" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Número de Teléfono *</label>
-                        <input type="text" id="telefono" required>
-                    </div>
-                </div>
-                
-                <button class="btn btn-submit" onclick="enviarQuiniela()" id="btnSubmit">💾 REGISTRAR Y GUARDAR QUINIELA</button>
-            </div>
-            <div class="btn-panel" style="justify-content: flex-start; background: transparent;">
-                <button class="btn" style="background: #ccc;" onclick="nextStep(2)">🡄 Revisar Pronósticos</button>
-            </div>
+    <!-- PASO 1: FASE DE GRUPOS -->
+    <div id="step1" class="step-container active">
+        <h2 style="text-align:center;margin-bottom:20px;color:var(--primary)">Paso 1: Fase de Grupos</h2>
+        <div class="info-note">📋 Ingresa los marcadores de cada partido. Los clasificados a dieciseisavos se calcularán automáticamente según tus pronósticos.</div>
+        <div id="groups-wrapper" class="groups-grid"></div>
+        <div class="btn-panel" style="justify-content:flex-end">
+            <button class="btn btn-next" onclick="proceedToR32()">Siguiente: Dieciseisavos ➔</button>
         </div>
     </div>
 
-    <script>
-        // REEMPLAZA ESTA URL POR LA NUEVA URL DE TU APPS SCRIPT
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwihW3kkVNiobTfCzwaRJYXtmrReK3tfcwUYNN4mRmmRleANVVuqaMEiEUzJL3xw2_XgQ/exec";
+    <!-- PASO 2: DIECISEISAVOS -->
+    <div id="step2" class="step-container">
+        <h2 style="text-align:center;margin-bottom:20px;color:var(--primary)">Paso 2: Dieciseisavos de Final (Ronda de 32)</h2>
+        <div class="info-note" id="r32-note">⚽ Los equipos se han calculado según tus pronósticos de grupos. Ingresa el resultado de cada partido.</div>
+        <div class="knockout-section">
+            <div id="r32-bracket" class="bracket-grid cols-8"></div>
+        </div>
+        <div class="btn-panel">
+            <button class="btn btn-back" onclick="goStep(1)">🡄 Volver</button>
+            <button class="btn btn-next" onclick="proceedToR16()">Siguiente: Octavos ➔</button>
+        </div>
+    </div>
 
-        // Grupos oficiales (Base corregida según validación FIFA)
-        const grupos = {
-            'A': ['México', 'Sudáfrica', 'Corea Sur', 'Rep. Checa'],
-            'B': ['Canadá', 'Bosnia', 'Catar', 'Suiza'],
-            'C': ['Brasil', 'Marruecos', 'Haití', 'Escocia'],
-            'D': ['USA', 'Paraguay', 'Australia', 'Turquía'],
-            'E': ['Alemania', 'Curazao', 'C. Marfil', 'Ecuador'],
-            'F': ['Países Bajos', 'Japón', 'Suecia', 'Túnez'],
-            'G': ['Bélgica', 'Egipto', 'Irán', 'N. Zelanda'],
-            'H': ['España', 'Cabo Verde', 'A. Saudita', 'Uruguay'],
-            'I': ['Francia', 'Senegal', 'Irak', 'Noruega'],
-            'J': ['Argentina', 'Argelia', 'Austria', 'Jordania'],
-            'K': ['Portugal', 'Congo', 'Uzbekistán', 'Colombia'],
-            'L': ['Inglaterra', 'Croacia', 'Ghana', 'Panamá']
-        };
+    <!-- PASO 3: OCTAVOS -->
+    <div id="step3" class="step-container">
+        <h2 style="text-align:center;margin-bottom:20px;color:var(--primary)">Paso 3: Octavos de Final (Ronda de 16)</h2>
+        <div class="info-note">⚽ Equipos calculados según dieciseisavos. Indica el marcador y si hubo penales.</div>
+        <div class="knockout-section">
+            <div id="r16-bracket" class="bracket-grid cols-4"></div>
+        </div>
+        <div class="btn-panel">
+            <button class="btn btn-back" onclick="goStep(2)">🡄 Volver</button>
+            <button class="btn btn-next" onclick="proceedToQF()">Siguiente: Cuartos ➔</button>
+        </div>
+    </div>
 
-        // Generar HTML de la Fase de Grupos
-        function renderGroups() {
-            let html = '';
-            for (let letra in grupos) {
-                const eqs = grupos[letra];
-                html += `<div class="group-card"><h3>Grupo ${letra}</h3>`;
-                const partidos = [
-                    [eqs[0], eqs[1]], [eqs[2], eqs[3]], 
-                    [eqs[0], eqs[2]], [eqs[1], eqs[3]], 
-                    [eqs[2], eqs[1]], [eqs[3], eqs[0]]
-                ];
-                partidos.forEach((p, idx) => {
-                    html += `<div class="match-row">
-                        <span style="width: 35%; text-align: right;">${p[0]}</span>
-                        <input type="number" min="0" id="g_${letra}_${idx}_L"> - 
-                        <input type="number" min="0" id="g_${letra}_${idx}_V">
-                        <span style="width: 35%;">${p[1]}</span>
-                    </div>`;
-                });
-                html += `</div>`;
-            }
-            document.getElementById('groups-wrapper').innerHTML = html;
+    <!-- PASO 4: CUARTOS -->
+    <div id="step4" class="step-container">
+        <h2 style="text-align:center;margin-bottom:20px;color:var(--primary)">Paso 4: Cuartos de Final</h2>
+        <div class="info-note">⚽ Equipos calculados según octavos. Indica el marcador y si hubo penales.</div>
+        <div class="knockout-section">
+            <div id="qf-bracket" class="bracket-grid cols-4"></div>
+        </div>
+        <div class="btn-panel">
+            <button class="btn btn-back" onclick="goStep(3)">🡄 Volver</button>
+            <button class="btn btn-next" onclick="proceedToSF()">Siguiente: Semis y Final ➔</button>
+        </div>
+    </div>
+
+    <!-- PASO 5: SEMIS + FINAL -->
+    <div id="step5" class="step-container">
+        <h2 style="text-align:center;margin-bottom:20px;color:var(--primary)">Paso 5: Semifinales y Final</h2>
+        <div class="knockout-section">
+            <h2>🏟️ Semifinales</h2>
+            <div id="sf-bracket" class="bracket-grid cols-2"></div>
+        </div>
+        <div class="knockout-section" style="margin-top:30px">
+            <h2>🥉 Tercer Puesto</h2>
+            <div id="tp-bracket" class="bracket-grid cols-2"></div>
+        </div>
+        <div class="knockout-section" style="margin-top:30px">
+            <h2>🏆 Gran Final</h2>
+            <div id="final-bracket" class="bracket-grid cols-2"></div>
+        </div>
+        <div class="btn-panel">
+            <button class="btn btn-back" onclick="goStep(4)">🡄 Volver</button>
+            <button class="btn btn-next" onclick="proceedToPremios()">Siguiente: Premios ➔</button>
+        </div>
+    </div>
+
+    <!-- PASO 6: PREMIOS -->
+    <div id="step6" class="step-container">
+        <h2 style="text-align:center;margin-bottom:20px;color:var(--primary)">Paso 6: Premios Especiales</h2>
+
+        <div class="special-section">
+            <h2>🌟 Premios Individuales (5 pts c/u)</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>⚽ Bota de Oro (Máximo Goleador)</label>
+                    <input type="text" id="botaOro" placeholder="Nombre del jugador">
+                </div>
+                <div class="input-group">
+                    <label>🌟 Balón de Oro (Mejor Jugador / MVP)</label>
+                    <input type="text" id="mvp" placeholder="Nombre del jugador">
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-panel">
+            <button class="btn btn-back" onclick="goStep(5)">🡄 Volver</button>
+            <button class="btn btn-next" onclick="goStep(7)">Siguiente: Registro ➔</button>
+        </div>
+    </div>
+
+    <!-- PASO 7: REGISTRO -->
+    <div id="step7" class="step-container">
+        <h2 style="text-align:center;margin-bottom:20px;color:var(--primary)">Paso 7: Registro Oficial</h2>
+        <div class="special-section">
+            <p style="margin-bottom:20px;text-align:center">Tus pronósticos están listos. Registra tus datos para guardar la quiniela. <strong>Solo se permite un registro por cédula.</strong></p>
+            <div class="form-grid">
+                <div class="input-group"><label>Nombre y Apellido *</label><input type="text" id="nombre" required></div>
+                <div class="input-group"><label>Cédula de Identidad *</label><input type="text" id="cedula" required></div>
+                <div class="input-group"><label>Gerencia / Unidad *</label><input type="text" id="gerencia" required></div>
+                <div class="input-group"><label>Número de Teléfono *</label><input type="text" id="telefono" required></div>
+            </div>
+            <button class="btn btn-submit" onclick="enviarQuiniela()" id="btnSubmit">💾 REGISTRAR Y GUARDAR QUINIELA</button>
+        </div>
+        <div class="btn-panel" style="justify-content:flex-start;background:transparent">
+            <button class="btn btn-back" onclick="goStep(6)">🡄 Revisar Premios</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwihW3kkVNiobTfCzwaRJYXtmrReK3tfcwUYNN4mRmmRleANVVuqaMEiEUzJL3xw2_XgQ/exec";
+
+// ─── ESTRUCTURA DEL TORNEO ───────────────────────────────────────────────────
+const grupos = {
+    'A': ['México','Sudáfrica','Corea Sur','Rep. Checa'],
+    'B': ['Canadá','Bosnia','Catar','Suiza'],
+    'C': ['Brasil','Marruecos','Haití','Escocia'],
+    'D': ['USA','Paraguay','Australia','Turquía'],
+    'E': ['Alemania','Curazao','C. Marfil','Ecuador'],
+    'F': ['Países Bajos','Japón','Suecia','Túnez'],
+    'G': ['Bélgica','Egipto','Irán','N. Zelanda'],
+    'H': ['España','Cabo Verde','A. Saudita','Uruguay'],
+    'I': ['Francia','Senegal','Irak','Noruega'],
+    'J': ['Argentina','Argelia','Austria','Jordania'],
+    'K': ['Portugal','Congo','Uzbekistán','Colombia'],
+    'L': ['Inglaterra','Croacia','Ghana','Panamá']
+};
+
+// Partidos de grupo: [local_idx, visitante_idx]
+const groupMatchups = [[0,1],[2,3],[0,2],[1,3],[2,1],[3,0]];
+
+// Cruce dieciseisavos según estructura FIFA 2026:
+// 16 líderes vs 8 mejores 3ros + 8 subcampeones
+// Usamos el bracket oficial de 32 partidos: 1ero vs 2do de grupos emparejados
+const r32Pairings = [
+    { label:'P1', g1:'A', pos1:0, g2:'B', pos2:1 },
+    { label:'P2', g1:'B', pos1:0, g2:'A', pos2:1 },
+    { label:'P3', g1:'C', pos1:0, g2:'D', pos2:1 },
+    { label:'P4', g1:'D', pos1:0, g2:'C', pos2:1 },
+    { label:'P5', g1:'E', pos1:0, g2:'F', pos2:1 },
+    { label:'P6', g1:'F', pos1:0, g2:'E', pos2:1 },
+    { label:'P7', g1:'G', pos1:0, g2:'H', pos2:1 },
+    { label:'P8', g1:'H', pos1:0, g2:'G', pos2:1 },
+    { label:'P9', g1:'I', pos1:0, g2:'J', pos2:1 },
+    { label:'P10',g1:'J', pos1:0, g2:'I', pos2:1 },
+    { label:'P11',g1:'K', pos1:0, g2:'L', pos2:1 },
+    { label:'P12',g1:'L', pos1:0, g2:'K', pos2:1 },
+    // 4 cruces restantes con mejores terceros
+    { label:'P13',g1:'A', pos1:0, g2:'C', pos2:2 },
+    { label:'P14',g1:'B', pos1:0, g2:'D', pos2:2 },
+    { label:'P15',g1:'E', pos1:0, g2:'G', pos2:2 },
+    { label:'P16',g1:'F', pos1:0, g2:'H', pos2:2 },
+];
+
+// ─── ESTADO GLOBAL ───────────────────────────────────────────────────────────
+let groupStandings = {}; // { 'A': [{team,pts,gf,ga,gd}, ...sorted] }
+let r32Winners = new Array(16).fill(null);
+let r16Winners = new Array(8).fill(null);
+let qfWinners  = new Array(4).fill(null);
+let sfWinners  = new Array(2).fill(null);
+let sfLosers   = new Array(2).fill(null);
+let finalWinner = null;
+
+// ─── INICIALIZACIÓN ──────────────────────────────────────────────────────────
+function renderGroups() {
+    let html = '';
+    for (let letra in grupos) {
+        const eqs = grupos[letra];
+        html += `<div class="group-card"><h3>Grupo ${letra}</h3>`;
+        groupMatchups.forEach((p, idx) => {
+            html += `<div class="match-row">
+                <span class="team-name right">${eqs[p[0]]}</span>
+                <input class="score-input" type="number" min="0" id="g_${letra}_${idx}_L" placeholder="0" oninput="onGroupInput()">
+                <span class="score-sep">-</span>
+                <input class="score-input" type="number" min="0" id="g_${letra}_${idx}_V" placeholder="0" oninput="onGroupInput()">
+                <span class="team-name">${eqs[p[1]]}</span>
+            </div>`;
+        });
+        html += `</div>`;
+    }
+    document.getElementById('groups-wrapper').innerHTML = html;
+}
+
+// ─── CÁLCULO DE POSICIONES ───────────────────────────────────────────────────
+function calcGroupStandings() {
+    groupStandings = {};
+    for (let letra in grupos) {
+        const eqs = grupos[letra];
+        let st = eqs.map(t => ({ team: t, pts: 0, gf: 0, ga: 0, gd: 0, played: 0 }));
+        groupMatchups.forEach((p, idx) => {
+            const gl = parseInt(document.getElementById(`g_${letra}_${idx}_L`)?.value);
+            const gv = parseInt(document.getElementById(`g_${letra}_${idx}_V`)?.value);
+            if (isNaN(gl) || isNaN(gv)) return;
+            st[p[0]].gf += gl; st[p[0]].ga += gv; st[p[0]].played++;
+            st[p[1]].gf += gv; st[p[1]].ga += gl; st[p[1]].played++;
+            if (gl > gv) { st[p[0]].pts += 3; }
+            else if (gl === gv) { st[p[0]].pts += 1; st[p[1]].pts += 1; }
+            else { st[p[1]].pts += 3; }
+        });
+        st.forEach(s => s.gd = s.gf - s.ga);
+        st.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.team.localeCompare(b.team));
+        groupStandings[letra] = st;
+    }
+}
+
+function getTeamByPos(group, pos) {
+    const st = groupStandings[group];
+    if (!st || !st[pos]) return '???';
+    return st[pos].team;
+}
+
+function onGroupInput() { calcGroupStandings(); }
+
+// ─── PASO 2: DIECISEISAVOS ───────────────────────────────────────────────────
+function proceedToR32() {
+    calcGroupStandings();
+    buildR32();
+    goStep(2);
+}
+
+function buildR32() {
+    const container = document.getElementById('r32-bracket');
+    container.innerHTML = '';
+    r32Pairings.forEach((pair, idx) => {
+        const t1 = getTeamByPos(pair.g1, pair.pos1);
+        const t2 = getTeamByPos(pair.g2, pair.pos2);
+        const lbl1 = `${pair.pos1 === 0 ? '1°' : pair.pos1 === 1 ? '2°' : '3°'} Gr.${pair.g1}`;
+        const lbl2 = `${pair.pos2 === 0 ? '1°' : pair.pos2 === 1 ? '2°' : '3°'} Gr.${pair.g2}`;
+        container.innerHTML += buildMatchCard(`r32_${idx}`, `Partido ${idx+1}`, t1, lbl1, t2, lbl2);
+    });
+}
+
+// ─── PASO 3: OCTAVOS ────────────────────────────────────────────────────────
+function proceedToR16() {
+    calcR32Winners();
+    buildR16();
+    goStep(3);
+}
+
+function calcR32Winners() {
+    r32Winners = r32Pairings.map((_, idx) => getMatchWinner(`r32_${idx}`));
+}
+
+function buildR16() {
+    const container = document.getElementById('r16-bracket');
+    container.innerHTML = '';
+    for (let i = 0; i < 16; i += 2) {
+        const t1 = r32Winners[i]   || `Ganador P${i+1}`;
+        const t2 = r32Winners[i+1] || `Ganador P${i+2}`;
+        container.innerHTML += buildMatchCard(`r16_${i/2}`, `Octavo ${i/2+1}`, t1, '', t2, '');
+    }
+}
+
+// ─── PASO 4: CUARTOS ────────────────────────────────────────────────────────
+function proceedToQF() {
+    calcR16Winners();
+    buildQF();
+    goStep(4);
+}
+
+function calcR16Winners() {
+    r16Winners = Array.from({length:8}, (_, i) => getMatchWinner(`r16_${i}`));
+}
+
+function buildQF() {
+    const container = document.getElementById('qf-bracket');
+    container.innerHTML = '';
+    for (let i = 0; i < 8; i += 2) {
+        const t1 = r16Winners[i]   || `Ganador Oct.${i+1}`;
+        const t2 = r16Winners[i+1] || `Ganador Oct.${i+2}`;
+        container.innerHTML += buildMatchCard(`qf_${i/2}`, `Cuarto ${i/2+1}`, t1, '', t2, '');
+    }
+}
+
+// ─── PASO 5: SEMIS + FINAL ──────────────────────────────────────────────────
+function proceedToSF() {
+    calcQFWinners();
+    buildSF();
+    goStep(5);
+}
+
+function calcQFWinners() {
+    qfWinners = Array.from({length:4}, (_, i) => getMatchWinner(`qf_${i}`));
+}
+
+function buildSF() {
+    // Semis
+    document.getElementById('sf-bracket').innerHTML =
+        buildMatchCard('sf_0', 'Semifinal 1', qfWinners[0]||'Gan. Cuarto 1', '', qfWinners[1]||'Gan. Cuarto 2', '') +
+        buildMatchCard('sf_1', 'Semifinal 2', qfWinners[2]||'Gan. Cuarto 3', '', qfWinners[3]||'Gan. Cuarto 4', '');
+
+    document.getElementById('tp-bracket').innerHTML =
+        buildMatchCard('tp_0', '3er Puesto', '???', '', '???', '');
+    document.getElementById('final-bracket').innerHTML =
+        buildMatchCard('final_0', '🏆 Gran Final', '???', '', '???', '');
+
+    // Listener para actualizar tercer puesto y final al cambiar semis
+    ['sf_0','sf_1'].forEach(id => {
+        const inputs = document.querySelectorAll(`[id^="${id}_"]`);
+        inputs.forEach(inp => inp.addEventListener('input', updateFinalRound));
+    });
+
+    updateFinalRound();
+}
+
+function updateFinalRound() {
+    const w0 = getMatchWinner('sf_0');
+    const w1 = getMatchWinner('sf_1');
+    const l0 = getMatchLoser('sf_0');
+    const l1 = getMatchLoser('sf_1');
+
+    // Tercer puesto
+    const tp = document.getElementById('tp-bracket');
+    if (tp) {
+        tp.innerHTML = buildMatchCard('tp_0', '3er Puesto',
+            l0||'Perdedor SF1', '', l1||'Perdedor SF2', '');
+    }
+
+    // Final
+    const fin = document.getElementById('final-bracket');
+    if (fin) {
+        fin.innerHTML = buildMatchCard('final_0', '🏆 Gran Final',
+            w0||'Ganador SF1', '', w1||'Ganador SF2', '');
+        document.querySelectorAll(`[id^="final_0_"]`).forEach(inp =>
+            inp.addEventListener('input', () => {}));
+    }
+}
+
+// ─── PASO 6: PREMIOS ────────────────────────────────────────────────────────
+function proceedToPremios() {
+    goStep(6);
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+
+// Almacena qué equipo ganó en penales para cada partido: { 'r32_0': 'México', ... }
+const penaltyWinners = {};
+
+function buildMatchCard(id, label, team1, sub1, team2, sub2) {
+    const s1 = sub1 ? ` <span style="font-size:0.68rem;color:#888;font-weight:400">${sub1}</span>` : '';
+    const s2 = sub2 ? ` <span style="font-size:0.68rem;color:#888;font-weight:400">${sub2}</span>` : '';
+    return `
+    <div class="bracket-match" id="card_${id}">
+        <div class="match-label">${label}</div>
+        <div class="team-row" id="${id}_row1">
+            <div class="team-pill auto" id="${id}_t1">${team1}${s1}</div>
+            <input class="ko-score" type="number" min="0" id="${id}_L" placeholder="–" oninput="onKoInput('${id}')">
+        </div>
+        <div class="team-row" id="${id}_row2">
+            <div class="team-pill auto" id="${id}_t2">${team2}${s2}</div>
+            <input class="ko-score" type="number" min="0" id="${id}_V" placeholder="–" oninput="onKoInput('${id}')">
+        </div>
+        <div class="pen-selector" id="${id}_pen_sel">
+            <p>⚽ Empate — ¿Quién gana en penales?</p>
+            <div class="pen-btns">
+                <button class="pen-btn" id="${id}_pen_t1" onclick="selectPenWinner('${id}',1)">${team1}</button>
+                <button class="pen-btn" id="${id}_pen_t2" onclick="selectPenWinner('${id}',2)">${team2}</button>
+            </div>
+        </div>
+        <div class="winner-banner" id="${id}_banner"></div>
+    </div>`;
+}
+
+function getTeamName(id, slot) {
+    // slot 1 = local, 2 = visitante
+    const el = document.getElementById(`${id}_t${slot}`);
+    if (!el) return null;
+    // Strip the sub-label span text
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll('span').forEach(s => s.remove());
+    return clone.textContent.trim();
+}
+
+function onKoInput(id) {
+    const gl = parseInt(document.getElementById(`${id}_L`)?.value);
+    const gv = parseInt(document.getElementById(`${id}_V`)?.value);
+    const penSel = document.getElementById(`${id}_pen_sel`);
+    const banner = document.getElementById(`${id}_banner`);
+
+    if (isNaN(gl) || isNaN(gv)) {
+        if (penSel) penSel.classList.remove('visible');
+        if (banner) { banner.textContent = ''; banner.className = 'winner-banner'; }
+        return;
+    }
+
+    if (gl === gv) {
+        // Empate: mostrar selector de penales
+        if (penSel) {
+            penSel.classList.add('visible');
+            // Actualizar labels de los botones con nombres actuales
+            const t1 = getTeamName(id, 1) || '???';
+            const t2 = getTeamName(id, 2) || '???';
+            const b1 = document.getElementById(`${id}_pen_t1`);
+            const b2 = document.getElementById(`${id}_pen_t2`);
+            if (b1) b1.textContent = t1;
+            if (b2) b2.textContent = t2;
         }
-
-        // Navegación entre pasos
-        function nextStep(step) {
-            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
-            document.getElementById(`step${step}`).classList.add('active');
-            window.scrollTo(0, 0);
+        // Si ya había un ganador por penales seleccionado, mantener
+        if (penaltyWinners[id]) {
+            updateBanner(id);
+        } else {
+            if (banner) { banner.textContent = '← Selecciona ganador en penales'; banner.className = 'winner-banner'; }
         }
+    } else {
+        // Ganador directo por goles
+        delete penaltyWinners[id];
+        if (penSel) penSel.classList.remove('visible');
+        updateBanner(id);
+    }
 
-        // Enviar todo el paquete JSON al servidor
-        async function enviarQuiniela() {
-            const btn = document.getElementById('btnSubmit');
-            const cedula = document.getElementById('cedula').value.trim();
-            const nombre = document.getElementById('nombre').value.trim();
-            const gerencia = document.getElementById('gerencia').value.trim();
-            const telefono = document.getElementById('telefono').value.trim();
+    // Propagar si es semifinal
+    if (id.startsWith('sf_')) updateFinalRound();
+}
 
-            if (!cedula || !nombre || !gerencia || !telefono) {
-                alert("⚠️ Por favor completa todos tus datos personales.");
-                return;
-            }
+function selectPenWinner(id, slot) {
+    const winner = getTeamName(id, slot);
+    penaltyWinners[id] = winner;
 
-            // Recopilar Grupos
-            let pronosticoGrupos = {};
-            for (let letra in grupos) {
-                pronosticoGrupos[letra] = [];
-                for(let i=0; i<6; i++) {
-                    let gl = document.getElementById(`g_${letra}_${i}_L`)?.value;
-                    let gv = document.getElementById(`g_${letra}_${i}_V`)?.value;
-                    pronosticoGrupos[letra].push({ local: gl, visitante: gv });
-                }
-            }
+    // Marcar botón activo
+    [1,2].forEach(s => {
+        const btn = document.getElementById(`${id}_pen_t${s}`);
+        if (btn) btn.classList.toggle('selected', s === slot);
+    });
 
-            const payload = {
-                action: "guardarQuiniela",
-                usuario: { cedula, nombre, gerencia, telefono },
-                pronosticos: {
-                    grupos: pronosticoGrupos,
-                    octavos: document.getElementById('octavos').value,
-                    premios: {
-                        campeon: document.getElementById('campeon').value,
-                        campeonPenales: document.getElementById('penalesCampeon').checked,
-                        botaOro: document.getElementById('botaOro').value,
-                        mvp: document.getElementById('mvp').value
-                    }
-                }
-            };
+    updateBanner(id);
+    if (id.startsWith('sf_')) updateFinalRound();
+}
 
-            btn.innerText = "⏳ Guardando en base de datos...";
-            btn.disabled = true;
+function updateBanner(id) {
+    const banner = document.getElementById(`${id}_banner`);
+    if (!banner) return;
+    const w = getMatchWinner(id);
+    if (w) {
+        banner.textContent = `Avanza: ${w}`;
+        banner.className = 'winner-banner has-winner';
+    } else {
+        banner.textContent = '';
+        banner.className = 'winner-banner';
+    }
+}
 
-            try {
-                const response = await fetch(URL_SCRIPT, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('step3').innerHTML = `
-                        <div style="text-align: center; padding: 50px;">
-                            <h1 style="color: #28a745; font-size: 4rem;">✅</h1>
-                            <h2 style="color: var(--primary); margin-top: 20px;">¡Quiniela Registrada con Éxito!</h2>
-                            <p style="margin-top: 10px; font-size: 1.2rem;">Tus pronósticos están seguros. ¡Mucha suerte!</p>
-                        </div>
-                    `;
-                } else {
-                    alert(`❌ Error: ${data.error}`);
-                    btn.innerText = "💾 REGISTRAR Y GUARDAR QUINIELA";
-                    btn.disabled = false;
-                }
-            } catch (error) {
-                alert("❌ Error de conexión. Intenta de nuevo.");
-                btn.innerText = "💾 REGISTRAR Y GUARDAR QUINIELA";
-                btn.disabled = false;
+function getMatchWinner(id) {
+    const gl = parseInt(document.getElementById(`${id}_L`)?.value);
+    const gv = parseInt(document.getElementById(`${id}_V`)?.value);
+    if (isNaN(gl) || isNaN(gv)) return null;
+    const t1 = getTeamName(id, 1);
+    const t2 = getTeamName(id, 2);
+    if (!t1 || !t2) return null;
+    if (gl > gv) return t1;
+    if (gv > gl) return t2;
+    // Empate: ganador por penales
+    return penaltyWinners[id] || null;
+}
+
+function getMatchLoser(id) {
+    const gl = parseInt(document.getElementById(`${id}_L`)?.value);
+    const gv = parseInt(document.getElementById(`${id}_V`)?.value);
+    if (isNaN(gl) || isNaN(gv)) return null;
+    const t1 = getTeamName(id, 1);
+    const t2 = getTeamName(id, 2);
+    if (!t1 || !t2) return null;
+    if (gl > gv) return t2;
+    if (gv > gl) return t1;
+    const winner = penaltyWinners[id];
+    if (!winner) return null;
+    return winner === t1 ? t2 : t1;
+}
+
+// ─── NAVEGACIÓN ──────────────────────────────────────────────────────────────
+function goStep(n) {
+    document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.step-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById(`step${n}`).classList.add('active');
+    document.getElementById(`tab${n}`).classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+// ─── RECOPILAR DATOS ─────────────────────────────────────────────────────────
+function collectKnockoutRound(ids) {
+    return ids.map(id => ({
+        local:      getTeamName(id, 1),
+        visitante:  getTeamName(id, 2),
+        gLocal:     document.getElementById(`${id}_L`)?.value || '',
+        gVisitante: document.getElementById(`${id}_V`)?.value || '',
+        penales:    !!(penaltyWinners[id]),
+        ganadorPenales: penaltyWinners[id] || null,
+        ganador:    getMatchWinner(id)
+    }));
+}
+
+// ─── ENVÍO ───────────────────────────────────────────────────────────────────
+async function enviarQuiniela() {
+    const btn = document.getElementById('btnSubmit');
+    const cedula   = document.getElementById('cedula').value.trim();
+    const nombre   = document.getElementById('nombre').value.trim();
+    const gerencia = document.getElementById('gerencia').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+
+    if (!cedula || !nombre || !gerencia || !telefono) {
+        alert("⚠️ Por favor completa todos tus datos personales.");
+        return;
+    }
+
+    calcGroupStandings();
+
+    let pronosticoGrupos = {};
+    for (let letra in grupos) {
+        pronosticoGrupos[letra] = groupMatchups.map((p, idx) => ({
+            local: grupos[letra][p[0]],
+            visitante: grupos[letra][p[1]],
+            gLocal: document.getElementById(`g_${letra}_${idx}_L`)?.value,
+            gVisitante: document.getElementById(`g_${letra}_${idx}_V`)?.value
+        }));
+    }
+
+    const r32ids  = r32Pairings.map((_, i) => `r32_${i}`);
+    const r16ids  = Array.from({length:8}, (_,i) => `r16_${i}`);
+    const qfids   = Array.from({length:4}, (_,i) => `qf_${i}`);
+    const sfids   = ['sf_0','sf_1'];
+    const tpids   = ['tp_0'];
+    const finids  = ['final_0'];
+
+    const finalCard = document.getElementById('final_0_L')?.closest('.bracket-match');
+    const finalPills = finalCard ? finalCard.querySelectorAll('.team-pill') : [];
+
+    const payload = {
+        action: "guardarQuiniela",
+        usuario: { cedula, nombre, gerencia, telefono },
+        pronosticos: {
+            grupos: pronosticoGrupos,
+            dieciseisavos: collectKnockoutRound(r32ids),
+            octavos:       collectKnockoutRound(r16ids),
+            cuartos:       collectKnockoutRound(qfids),
+            semifinales:   collectKnockoutRound(sfids),
+            tercerPuesto:  collectKnockoutRound(tpids),
+            final:         collectKnockoutRound(finids),
+            premios: {
+                botaOro: document.getElementById('botaOro').value,
+                mvp:     document.getElementById('mvp').value
             }
         }
+    };
 
-        // Inicializar
-        renderGroups();
-    </script>
+    btn.textContent = "⏳ Guardando en base de datos...";
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(URL_SCRIPT, {
+            method: 'POST', mode: 'cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('step7').innerHTML = `
+                <div style="text-align:center;padding:60px 20px">
+                    <div style="font-size:4rem">✅</div>
+                    <h2 style="color:var(--primary);margin-top:20px">¡Quiniela Registrada con Éxito!</h2>
+                    <p style="margin-top:12px;font-size:1.1rem;color:#555">Tus pronósticos están seguros. ¡Mucha suerte en el Mundial 2026!</p>
+                </div>`;
+        } else {
+            alert(`❌ Error: ${data.error}`);
+            btn.textContent = "💾 REGISTRAR Y GUARDAR QUINIELA";
+            btn.disabled = false;
+        }
+    } catch (err) {
+        alert("❌ Error de conexión. Intenta de nuevo.");
+        btn.textContent = "💾 REGISTRAR Y GUARDAR QUINIELA";
+        btn.disabled = false;
+    }
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+renderGroups();
+</script>
 </body>
 </html>
+

@@ -21,6 +21,12 @@
         .header h1 { font-size: 2.5rem; text-transform: uppercase; letter-spacing: 2px; }
         .header p { margin-top: 8px; opacity: 0.85; }
 
+        /* Progress Bar Enhancements */
+        .progress-wrapper { background: #e9ecef; padding: 12px 25px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 2px solid #ddd; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .progress-container { background: #fff; height: 16px; flex: 1; border-radius: 20px; overflow: hidden; border: 1px solid #ccc; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        #progressBar { background: linear-gradient(90deg, var(--primary) 0%, var(--gold) 50%, var(--gold-light) 100%); height: 100%; width: 0%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        #progressText { font-size: 1rem; font-weight: 800; color: var(--primary); min-width: 50px; text-align: right; letter-spacing: 0.5px; }
+
         /* Steps nav */
         .steps-nav { display: flex; background: #1a472a; }
         .step-tab { flex: 1; padding: 14px 5px; text-align: center; color: rgba(255,255,255,0.5); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; border-right: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
@@ -98,7 +104,7 @@
         .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
         /* Validation */
-        .score-input.error, .ko-score.error { border-color: #e53935 !important; background: #fff5f5; animation: shake 0.3s; }
+        .score-input.error, .ko-score.error, .input-group input.error { border-color: #e53935 !important; background: #fff5f5; animation: shake 0.3s; }
         .bracket-match.error { border-left-color: #e53935; }
         .match-row.error .score-input { border-color: #e53935 !important; background: #fff5f5; }
         @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
@@ -115,25 +121,28 @@
         }
        
         @media (max-width: 600px) {
-    body { padding: 5px; }
-    .container { border-radius: 0; }
-    .score-input, .ko-score { width: 50px; height: 50px; font-size: 1.2rem; }
-    .btn { padding: 15px; width: 100%; }
-    input { font-size: 16px !important; } /* Previene zoom en iOS */
-}
+            body { padding: 5px; }
+            .container { border-radius: 0; }
+            .score-input, .ko-score { width: 50px; height: 50px; font-size: 1.2rem; }
+            .btn { padding: 15px; width: 100%; }
+            input { font-size: 16px !important; }
+        }
     </style>
 </head>
 <body>
 <div id="toast"></div>
 <div class="container">
-  <div class="header">
-    <h1>🏆 Quiniela Mundial 2026</h1>
-    <p>Acierta los resultados, acumula puntos y lidera el ranking</p>
-</div>
+    <div class="header">
+        <h1>🏆 Quiniela Mundial 2026</h1>
+        <p>Acierta los resultados, acumula puntos y lidera el ranking</p>
+    </div>
 
-<div class="progress-container" style="background:#eee; height:8px; width:100%;">
-    <div id="progressBar" style="background:var(--gold); height:100%; width:0%; transition: width 0.4s;"></div>
-</div>
+    <div class="progress-wrapper">
+        <div class="progress-container">
+            <div id="progressBar"></div>
+        </div>
+        <span id="progressText">0%</span>
+    </div>
 
     <div class="steps-nav">
         <div class="step-tab active" id="tab1">1. Grupos</div>
@@ -141,7 +150,7 @@
         <div class="step-tab" id="tab3">3. Octavos</div>
         <div class="step-tab" id="tab4">4. Cuartos</div>
         <div class="step-tab" id="tab5">5. Semis & Final</div>
-        <div class="step-tab" id="tab6">6. Premios</div>
+        <div class="step-tab" id="tab6">6. BONUS</div>
         <div class="step-tab" id="tab7">7. Registro</div>
     </div>
 
@@ -189,16 +198,17 @@
         <div class="knockout-section" style="margin-top:30px"><h2>🏆 Gran Final</h2><div id="final-bracket" class="bracket-grid cols-2"></div></div>
         <div class="btn-panel">
             <button class="btn btn-back" onclick="goStep(4)">🡄 Volver</button>
-            <button class="btn btn-next" onclick="proceedToPremios()">Siguiente: Premios ➔</button>
+            <button class="btn btn-next" onclick="proceedToBonus()">Siguiente: BONUS ➔</button>
         </div>
     </div>
 
     <div id="step6" class="step-container">
-        <h2 style="text-align:center;margin-bottom:20px;color:var(--primary)">Paso 6: Premios Especiales</h2>
+        <h2 style="text-align:center;margin-bottom:20px;color:var(--primary)">Paso 6: Bonus Especiales</h2>
         <div class="special-section">
             <div class="form-grid">
-                <div class="input-group"><label>⚽ Bota de Oro</label><input type="text" id="botaOro"></div>
-                <div class="input-group"><label>🌟 Balón de Oro (MVP)</label><input type="text" id="mvp"></div>
+                <div class="input-group"><label>⚽ Jugador Bota de Oro</label><input type="text" id="botaOro"></div>
+                <div class="input-group"><label>🌟 Jugador Balón de Oro (MVP)</label><input type="text" id="mvp"></div>
+                <div class="input-group"><label>🧤 Portero Guante de Oro</label><input type="text" id="guanteOro"></div>
             </div>
         </div>
         <div class="btn-panel">
@@ -219,21 +229,18 @@
             <button class="btn btn-submit" onclick="enviarQuiniela()" id="btnSubmit">💾 REGISTRAR Y GUARDAR QUINIELA</button>
         </div>
         <div class="btn-panel" style="justify-content:flex-start;background:transparent">
-            <button class="btn btn-back" onclick="goStep(6)">🡄 Revisar Premios</button>
+            <button class="btn btn-back" onclick="goStep(6)">🡄 Revisar Bonus</button>
         </div>
     </div>
 </div>
 
 <script>
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwdqLJ3LAvsaHd9hu0f86JGjW9IVpBGH8PcgqKx3q-p6MXnq554Y9JGw-Kj-0iMCKim/exec";
-
 // ─── MATRIZ DE TERCEROS CLASIFICADOS (Parser CSV) ────────────────────────────
-// PEGA EL CONTENIDO COMPLETO DE TU ARCHIVO "Combinaciones.csv" AQUÍ:
 const CSV_COMBINACIONES = `
 EFGHIJKL,0,Costa de Marfil,Austria,Irak,Suecia,Arabia Saudita,Irán,Ghana,Uzbekistán,,2.12,,EFGHIJKL,1,3E,3J,3I,3F,3H,3G,3L,3K
 DFGHIJKL,0,Arabia Saudita,Irán,Irak,Australia,Austria,Suecia,Ghana,Uzbekistán,,,,DFGHIJKL,2,3H,3G,3I,3D,3J,3F,3L,3K
 DEGHIJKL,0,Costa de Marfil,Austria,Irak,Australia,Arabia Saudita,Irán,Ghana,Uzbekistán,,,,DEGHIJKL,3,3E,3J,3I,3D,3H,3G,3L,3K
-// Nota: Pega aquí todas las 495 filas generadas por el Excel.
 ABCDEFGH,0,Arabia Saudita,Irán,Catar,Haití,Corea del Sur,Suecia,Australia,Costa de Marfil,,,,ABCDEFGH,495,3H,3G,3B,3C,3A,3F,3D,3E
 `;
 
@@ -243,8 +250,7 @@ function initCombinations() {
         if(!line || line.startsWith('//')) return;
         const cols = line.split(',');
         if(cols.length < 10) return;
-        const key = cols[0].trim(); // Ejemplo: EFGHIJKL
-        // Los destinos corresponden a los rivales de los ganadores: 1A, 1B, 1D, 1E, 1G, 1I, 1K, 1L
+        const key = cols[0].trim();
         matrixThirds[key] = {
             '1A': cols[cols.length - 8].replace('3','').trim(),
             '1B': cols[cols.length - 7].replace('3','').trim(),
@@ -261,7 +267,6 @@ initCombinations();
 
 function getMapping(bestGroupsCode) {
     if (matrixThirds[bestGroupsCode]) return matrixThirds[bestGroupsCode];
-    // Fallback de seguridad
     const arr = bestGroupsCode.split('');
     return { '1A':arr[0]||'?', '1B':arr[1]||'?', '1D':arr[2]||'?', '1E':arr[3]||'?', '1G':arr[4]||'?', '1I':arr[5]||'?', '1K':arr[6]||'?', '1L':arr[7]||'?' };
 }
@@ -283,7 +288,6 @@ const grupos = {
 };
 const groupMatchups = [[0,1],[2,3],[0,2],[1,3],[2,1],[3,0]];
 
-// Árbol Oficial FIFA Partidos 73 a 104 separados individualmente
 const matchStructure = {
     r32: [
         { id: 73, l: '2A', v: '2B' }, { id: 74, l: '1F', v: '2C' }, { id: 75, l: '1C', v: '2F' }, { id: 76, l: '1E', v: '3E' },
@@ -300,7 +304,6 @@ const matchStructure = {
     tp:  [ { id: 103, l: 'L101', v: 'L102' } ],
     fin: [ { id: 104, l: 'W101', v: 'W102', isFinal: true } ]
 };
-
 let groupStandings = {};
 let top8Thirds = [];
 let mappingUsed = {};
@@ -344,13 +347,11 @@ function calcGroupStandings() {
             }
         });
         st.forEach(s => s.gd = s.gf - s.ga);
-        // Criterio Desempate Excel: PTS > DG > GF > Nombre
         st.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.team.localeCompare(b.team));
         groupStandings[letra] = st;
-        allThirds.push(st[2]); // Guardamos al 3er clasificado
+        allThirds.push(st[2]);
     }
 
-    // Calcular los 8 mejores terceros
     allThirds.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.team.localeCompare(b.team));
     top8Thirds = allThirds.slice(0, 8);
     const keyGroups = top8Thirds.map(t => t.group).sort().join('');
@@ -365,8 +366,8 @@ function resolveTeam(code) {
         return { name: groupStandings[grp][pos]?.team || '???', sub: `${code[0]}° Gr.${grp}` };
     }
     if (code.startsWith('3')) {
-        const targetWinner = '1' + code[1]; // ej: '1E'
-        const originGroup = mappingUsed[targetWinner]; 
+        const targetWinner = '1' + code[1];
+        const originGroup = mappingUsed[targetWinner];
         const teamObj = top8Thirds.find(t => t.group === originGroup);
         return { name: teamObj ? teamObj.team : '???', sub: `3° Gr.${originGroup || '?'}` };
     }
@@ -409,10 +410,9 @@ function proceedToRound(target) {
     } else if (target === 'sf') {
         if (!validateKnockoutRound(matchStructure.qf.map(m=>`m${m.id}`), 'Cuartos')) return;
         renderKnockoutRound('sf', 'sf-bracket');
-        renderKnockoutRound('tp', 'tp-bracket'); // Renderiza 3er Puesto separadamente
-        renderKnockoutRound('fin', 'final-bracket'); // Renderiza la Gran Final separadamente
+        renderKnockoutRound('tp', 'tp-bracket');
+        renderKnockoutRound('fin', 'final-bracket');
         
-        // Escuchar inputs de SF para refrescar automáticamente 3er Puesto y Final
         ['m101','m102'].forEach(id => {
             document.getElementById(`${id}_L`)?.addEventListener('input', updateFinals);
             document.getElementById(`${id}_V`)?.addEventListener('input', updateFinals);
@@ -426,11 +426,10 @@ function updateFinals() {
     renderKnockoutRound('fin', 'final-bracket');
 }
 
-function proceedToPremios() {
+function proceedToBonus() {
     const sfIds = matchStructure.sf.map(m=>`m${m.id}`);
     const tpIds = matchStructure.tp.map(m=>`m${m.id}`);
     const finIds = matchStructure.fin.map(m=>`m${m.id}`);
-    
     if (!validateKnockoutRound([...sfIds, ...tpIds, ...finIds], 'Semifinales y Finales')) return;
     goStep(6);
 }
@@ -439,10 +438,13 @@ function proceedToRegistro() {
     clearErrors();
     const bota = document.getElementById('botaOro').value.trim();
     const mvp = document.getElementById('mvp').value.trim();
-    if (!bota || !mvp) {
+    const guante = document.getElementById('guanteOro').value.trim();
+    
+    if (!bota || !mvp || !guante) {
         if(!bota) document.getElementById('botaOro').classList.add('error');
         if(!mvp) document.getElementById('mvp').classList.add('error');
-        showToast('⚠️ Ingresa pronósticos para Bota y Balón de Oro.');
+        if(!guante) document.getElementById('guanteOro').classList.add('error');
+        showToast('⚠️ Ingresa pronósticos para Bota, Balón y Guante de Oro.');
         return;
     }
     goStep(7);
@@ -622,7 +624,6 @@ async function enviarQuiniela() {
     const btn = document.getElementById('btnSubmit');
     const ped = id => document.getElementById(id).value.trim();
     const [cedula, nombre, gerencia, telefono] = [ped('cedula'), ped('nombre'), ped('gerencia'), ped('telefono')];
-    
     if (!cedula || !nombre || !gerencia || !telefono) {
         showToast("⚠️ Por favor completa todos tus datos personales.");
         return;
@@ -648,10 +649,9 @@ async function enviarQuiniela() {
             semifinales:   collectKnockoutRound(matchStructure.sf.map(m=>'m'+m.id)),
             tercerPuesto:  collectKnockoutRound(matchStructure.tp.map(m=>'m'+m.id)),
             final:         collectKnockoutRound(matchStructure.fin.map(m=>'m'+m.id)),
-            premios: { botaOro: ped('botaOro'), mvp: ped('mvp') }
+            premios: { botaOro: ped('botaOro'), mvp: ped('mvp'), guanteOro: ped('guanteOro') }
         }
     };
-
     btn.textContent = "⏳ Guardando en base de datos..."; btn.disabled = true;
     try {
         const response = await fetch(URL_SCRIPT, {
@@ -679,10 +679,10 @@ async function enviarQuiniela() {
 document.addEventListener('input', e => {
     if (e.target.classList.contains('error')) {
         e.target.classList.remove('error');
-        e.target.closest('.match-row, .bracket-match')?.classList.remove('error');
+        e.target.closest('.match-row, .bracket-match, .input-group')?.classList.remove('error');
     }
 });
-    
+
 // ─── PERSISTENCIA Y VALIDACIÓN ──────────────────────────────────
 function saveProgress() {
     const data = {};
@@ -708,13 +708,14 @@ function updateProgressBar() {
     const inputs = document.querySelectorAll('input[type="number"], input[type="text"]');
     let filled = 0;
     inputs.forEach(i => { if(i.value.trim() !== "") filled++; });
-    const percent = (filled / inputs.length) * 100;
+    const percent = inputs.length > 0 ? Math.round((filled / inputs.length) * 100) : 0;
+    
     document.getElementById('progressBar').style.width = percent + '%';
+    document.getElementById('progressText').textContent = percent + '%';
 }
 
 // Eventos de carga y validación
 document.addEventListener('DOMContentLoaded', () => {
-    // Restricción numérica para cédula y teléfono
     ['cedula', 'telefono'].forEach(id => {
         const el = document.getElementById(id);
         if(el) el.addEventListener('input', (e) => e.target.value = e.target.value.replace(/[^0-9]/g, ''));

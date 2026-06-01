@@ -235,7 +235,11 @@
 </div>
 
 <script>
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwdqLJ3LAvsaHd9hu0f86JGjW9IVpBGH8PcgqKx3q-p6MXnq554Y9JGw-Kj-0iMCKim/exec";
+// =============================================================================
+// CONFIGURACIÓN DE CONEXIÓN ÚNICA
+// =============================================================================
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycby0__EJXgmzmo1lQukvjJhBWyN4O5eOY5hQ8c921PrhcgfHfCNnMB5nqt2vExdyN3FV/exec";
+
 // ─── MATRIZ DE TERCEROS CLASIFICADOS (Parser CSV) ────────────────────────────
 const CSV_COMBINACIONES = `
 EFGHIJKL,0,Costa de Marfil,Austria,Irak,Suecia,Arabia Saudita,Irán,Ghana,Uzbekistán,,2.12,,EFGHIJKL,1,3E,3J,3I,3F,3H,3G,3L,3K
@@ -621,15 +625,10 @@ function collectKnockoutRound(ids) {
 
 // ─── ENVÍO ───────────────────────────────────────────────────────────────────
 // =============================================================================
-// CONFIGURACIÓN DE CONEXIÓN (Modifica esto con tu URL real)
-// =============================================================================
-const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycby0__EJXgmzmo1lQukvjJhBWyN4O5eOY5hQ8c921PrhcgfHfCNnMB5nqt2vExdyN3FV/exec'; 
-
-// =============================================================================
 // FUNCIÓN OPTIMIZADA ENVIAR QUINIELA
 // =============================================================================
 async function enviarQuiniela() {
-  const btn = document.getElementById('btnSubmit'); // Asegúrate de que tu botón tenga id="btnSubmit"
+  const btn = document.getElementById('btnSubmit');
   const ped = id => document.getElementById(id) ? document.getElementById(id).value.trim() : "";
   
   // Extraer datos personales del usuario
@@ -640,7 +639,6 @@ async function enviarQuiniela() {
 
   // 1. Validación de seguridad para campos vacíos
   if (!cedula || !nombre || !gerencia || !telefono) {
-    // Si usas showToast() puedes cambiar esto por: showToast("⚠️ Por favor completa tus datos.");
     alert("⚠️ Por favor completa todos tus datos personales y de contacto.");
     return;
   }
@@ -652,7 +650,7 @@ async function enviarQuiniela() {
   try {
     const partidosPlano = [];
     
-    // 3. Recolección de Fase de Grupos en base a tus variables del sistema
+    // 3. Recolección de Fase de Grupos
     for (let letra in grupos) {
       groupMatchups.forEach((p, idx) => {
         const idPartido = `grupo_${letra}_${idx}`;
@@ -668,7 +666,7 @@ async function enviarQuiniela() {
       });
     }
 
-    // 4. Recolección de Fases Eliminatorias (Preservando mapeo de IDs y penales)
+    // 4. Recolección de Fases Eliminatorias
     const fases = [
       { nombre: 'dieciseisavos', matches: matchStructure.r32 },
       { nombre: 'octavos', matches: matchStructure.r16 },
@@ -681,7 +679,7 @@ async function enviarQuiniela() {
     for (const fase of fases) {
       for (const match of fase.matches) {
         const id = 'm' + match.id;
-        const local = getTeamName(id, 1); // Llama a tu función nativa para obtener nombres
+        const local = getTeamName(id, 1);
         const visitante = getTeamName(id, 2);
         const gLocal = document.getElementById(`${id}_L`)?.value;
         const gVisitante = document.getElementById(`${id}_V`)?.value;
@@ -695,7 +693,7 @@ async function enviarQuiniela() {
       }
     }
 
-    // 5. Construcción del Payload unificado para Google Sheets
+    // 5. Construcción del Payload
     const payload = {
       action: "guardarQuiniela",
       usuario: { cedula, nombre, gerencia, telefono },
@@ -707,7 +705,7 @@ async function enviarQuiniela() {
       }
     };
 
-    // 6. Envío Asíncrono optimizado mediante POST directo sin headers pesados
+    // 6. Envío Asíncrono
     const response = await fetch(URL_SCRIPT, {
       method: 'POST',
       body: JSON.stringify(payload)
@@ -715,9 +713,8 @@ async function enviarQuiniela() {
 
     const data = await response.json();
     
-    // 7. Respuesta y feedback en la interfaz de usuario
+    // 7. Respuesta Visual
     if (data.success) {
-      // Reemplaza la sección del contenedor final para dar un feedback limpio
       document.getElementById('step7').innerHTML = `
         <div style="text-align:center;padding:60px;font-family:sans-serif;">
           <div style="font-size:4rem">✅</div>
@@ -731,8 +728,6 @@ async function enviarQuiniela() {
   } catch (err) {
     console.error(err);
     alert(`❌ Hubo un error al registrar: ${err.message}. Intenta nuevamente.`);
-    
-    // Si falla, reactivamos el botón para permitir reintentar
     btn.textContent = "💾 REGISTRAR"; 
     btn.disabled = false;
   }

@@ -113,15 +113,27 @@
             .bracket-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
             .bracket-grid.cols-2 { grid-template-columns: 1fr; }
         }
+       
+        @media (max-width: 600px) {
+    body { padding: 5px; }
+    .container { border-radius: 0; }
+    .score-input, .ko-score { width: 50px; height: 50px; font-size: 1.2rem; }
+    .btn { padding: 15px; width: 100%; }
+    input { font-size: 16px !important; } /* Previene zoom en iOS */
+}
     </style>
 </head>
 <body>
 <div id="toast"></div>
 <div class="container">
-    <div class="header">
-        <h1>🏆 Quiniela Mundial 2026</h1>
-        <p>Acierta los resultados, acumula puntos y lidera el ranking</p>
-    </div>
+  <div class="header">
+    <h1>🏆 Quiniela Mundial 2026</h1>
+    <p>Acierta los resultados, acumula puntos y lidera el ranking</p>
+</div>
+
+<div class="progress-container" style="background:#eee; height:8px; width:100%;">
+    <div id="progressBar" style="background:var(--gold); height:100%; width:0%; transition: width 0.4s;"></div>
+</div>
 
     <div class="steps-nav">
         <div class="step-tab active" id="tab1">1. Grupos</div>
@@ -670,7 +682,49 @@ document.addEventListener('input', e => {
         e.target.closest('.match-row, .bracket-match')?.classList.remove('error');
     }
 });
+    
+// ─── PERSISTENCIA Y VALIDACIÓN ──────────────────────────────────
+function saveProgress() {
+    const data = {};
+    document.querySelectorAll('input').forEach(input => {
+        if(input.id) data[input.id] = input.value;
+    });
+    localStorage.setItem('quiniela_data_2026', JSON.stringify(data));
+    updateProgressBar();
+}
 
+function loadProgress() {
+    const saved = localStorage.getItem('quiniela_data_2026');
+    if(!saved) return;
+    const data = JSON.parse(saved);
+    Object.keys(data).forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = data[id];
+    });
+    updateProgressBar();
+}
+
+function updateProgressBar() {
+    const inputs = document.querySelectorAll('input[type="number"], input[type="text"]');
+    let filled = 0;
+    inputs.forEach(i => { if(i.value.trim() !== "") filled++; });
+    const percent = (filled / inputs.length) * 100;
+    document.getElementById('progressBar').style.width = percent + '%';
+}
+
+// Eventos de carga y validación
+document.addEventListener('DOMContentLoaded', () => {
+    // Restricción numérica para cédula y teléfono
+    ['cedula', 'telefono'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.addEventListener('input', (e) => e.target.value = e.target.value.replace(/[^0-9]/g, ''));
+    });
+    loadProgress(); 
+});
+
+// Guardado automático global
+document.addEventListener('input', saveProgress);
+    
 renderGroups();
 </script>
 </body>

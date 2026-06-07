@@ -794,11 +794,34 @@ function descargarPronostico() {
           }
 
         document.getElementById('step7').innerHTML = `
-          <div style="text-align:center;padding:60px;font-family:sans-serif;">
-            <div style="font-size:4rem">✅</div>
-            <h2 style="color:#1a472a;">¡Quiniela Registrada con Éxito!</h2>
-            <p>Tus pronósticos ya quedaron guardados en la base de datos oficial.</p>
-          </div>`;
+  <div style="text-align:center;padding:60px;font-family:sans-serif;">
+    <div style="font-size:4rem">✅</div>
+
+    <h2 style="color:#1a472a;">
+      ¡Quiniela Registrada con Éxito!
+    </h2>
+
+    <p>
+      Tus pronósticos ya quedaron guardados en la base de datos oficial.
+    </p>
+
+    <br>
+
+    <button
+      onclick="nuevoRegistro()"
+      style="
+        background:#1a472a;
+        color:white;
+        border:none;
+        padding:15px 30px;
+        border-radius:10px;
+        font-size:16px;
+        font-weight:bold;
+        cursor:pointer;
+      ">
+      ➕ Registrar Nueva Quiniela
+    </button>
+  </div>`;
       } catch (err) {
         console.error(err);
         alert(`❌ Hubo un error al registrar: ${err.message}`);

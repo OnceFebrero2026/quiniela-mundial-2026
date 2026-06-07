@@ -857,6 +857,33 @@ function descargarPronostico() {
       document.getElementById('progressText').textContent = percent + '%';
     }
 
+    function nuevoRegistro() {
+
+  if (!confirm('¿Deseas iniciar una nueva quiniela?')) {
+    return;
+  }
+
+  localStorage.removeItem('quiniela_data_2026');
+
+  document.querySelectorAll('input').forEach(input => {
+    input.value = '';
+  });
+
+  Object.keys(penaltyWinners).forEach(key => {
+    delete penaltyWinners[key];
+  });
+
+  goStep(1);
+
+  renderGroups();
+
+  calcGroupStandings();
+
+  updateProgressBar();
+
+  showToast('✅ Formulario reiniciado correctamente.');
+}
+    
     document.addEventListener('DOMContentLoaded', () => {
       ['cedula', 'telefono'].forEach(id => {
         const el = document.getElementById(id);

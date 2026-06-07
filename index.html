@@ -230,17 +230,17 @@
     const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbw7Sp4J5phLsbuDaOfZgyvPixtbStMhNITeEr9IoKct-ZLpGGDzUEOJMacVjHiKjUb_Kw/exec';
 
     const grupos = {
-      A: ['México','Sudáfrica','Corea Sur','Rep. Checa'],
+      A: ['México','Sudáfrica','Corea del Sur','Chequia']
       B: ['Canadá','Bosnia','Catar','Suiza'],
       C: ['Brasil','Marruecos','Haití','Escocia'],
-      D: ['USA','Paraguay','Australia','Turquía'],
-      E: ['Alemania','Curazao','C. Marfil','Ecuador'],
+     D: ['Estados Unidos','Paraguay','Australia','Turquía']
+     E: ['Alemania','Curazao','Costa de Marfil','Ecuador']
       F: ['Países Bajos','Japón','Suecia','Túnez'],
-      G: ['Bélgica','Egipto','Irán','N. Zelanda'],
-      H: ['España','Cabo Verde','A. Saudita','Uruguay'],
+      G: ['Bélgica','Egipto','Irán','Nueva Zelanda']
+     H: ['España','Cabo Verde','Arabia Saudita','Uruguay']
       I: ['Francia','Senegal','Irak','Noruega'],
       J: ['Argentina','Argelia','Austria','Jordania'],
-      K: ['Portugal','Congo','Uzbekistán','Colombia'],
+     K: ['Portugal','RD Congo','Uzbekistán','Colombia']
       L: ['Inglaterra','Croacia','Ghana','Panamá']
     };
 
@@ -467,39 +467,100 @@
 }
 
     function calcGroupStandings() {
-      groupStandings = {};
-      const allThirds = [];
 
-      for (const letra in grupos) {
-        const eqs = grupos[letra];
-        const st = eqs.map(t => ({ team: t, group: letra, pts: 0, gf: 0, ga: 0, gd: 0 }));
+  groupStandings = {};
+  const allThirds = [];
 
-        GROUP_FIXTURES[group].forEach((match,index)=>{
-          const gl = parseInt(document.getElementById(`g_${letra}_${idx}_L`)?.value, 10);
-          const gv = parseInt(document.getElementById(`g_${letra}_${idx}_V`)?.value, 10);
+  for (const letra in grupos) {
 
-          if (!isNaN(gl) && !isNaN(gv)) {
-            st[p[0]].gf += gl; st[p[0]].ga += gv;
-            st[p[1]].gf += gv; st[p[1]].ga += gl;
+    const st = grupos[letra].map(team => ({
+      team,
+      group: letra,
+      pts: 0,
+      gf: 0,
+      ga: 0,
+      gd: 0
+    }));
 
-            if (gl > gv) st[p[0]].pts += 3;
-            else if (gl === gv) { st[p[0]].pts += 1; st[p[1]].pts += 1; }
-            else st[p[1]].pts += 3;
-          }
-        });
+    GROUP_FIXTURES[letra].forEach((match, idx) => {
 
-        st.forEach(s => s.gd = s.gf - s.ga);
-        st.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.team.localeCompare(b.team));
-        groupStandings[letra] = st;
-        allThirds.push(st[2]);
+      const local = match[0];
+      const visitante = match[1];
+
+      const gl =
+        parseInt(
+          document.getElementById(`g_${letra}_${idx}_L`)?.value,
+          10
+        );
+
+      const gv =
+        parseInt(
+          document.getElementById(`g_${letra}_${idx}_V`)?.value,
+          10
+        );
+
+      if (isNaN(gl) || isNaN(gv)) return;
+
+      const iLocal =
+        st.findIndex(t => t.team === local);
+
+      const iVisitante =
+        st.findIndex(t => t.team === visitante);
+
+      if (iLocal < 0 || iVisitante < 0) return;
+
+      st[iLocal].gf += gl;
+      st[iLocal].ga += gv;
+
+      st[iVisitante].gf += gv;
+      st[iVisitante].ga += gl;
+
+      if (gl > gv) {
+        st[iLocal].pts += 3;
+      } else if (gv > gl) {
+        st[iVisitante].pts += 3;
+      } else {
+        st[iLocal].pts += 1;
+        st[iVisitante].pts += 1;
       }
 
-      allThirds.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.team.localeCompare(b.team));
-      top8Thirds = allThirds.slice(0, 8);
-      const keyGroups = top8Thirds.map(t => t.group).sort().join('');
-      mappingUsed = getMapping(keyGroups);
-    }
+    });
 
+    st.forEach(t => {
+      t.gd = t.gf - t.ga;
+    });
+
+    st.sort((a, b) =>
+      b.pts - a.pts ||
+      b.gd - a.gd ||
+      b.gf - a.gf ||
+      a.team.localeCompare(b.team)
+    );
+
+    groupStandings[letra] = st;
+    allThirds.push(st[2]);
+
+  }
+
+  allThirds.sort((a, b) =>
+    b.pts - a.pts ||
+    b.gd - a.gd ||
+    b.gf - a.gf ||
+    a.team.localeCompare(b.team)
+  );
+
+  top8Thirds = allThirds.slice(0, 8);
+
+  const keyGroups =
+    top8Thirds
+      .map(t => t.group)
+      .sort()
+      .join('');
+
+  mappingUsed = getMapping(keyGroups);
+
+}
+    
     function resolveTeam(code) {
       if (/^[12][A-L]$/.test(code)) {
         const pos = parseInt(code[0], 10) - 1;
@@ -618,30 +679,56 @@
       updateProgressBar();
     }
 
-    function validateGroups() {
-      clearErrors();
-      let missing = 0;
+function validateGroups() {
 
-      for (const letra in grupos) {
-        GROUP_FIXTURES[group].forEach((match,index)=>{
-          const lEl = document.getElementById(`g_${letra}_${idx}_L`);
-          const vEl = document.getElementById(`g_${letra}_${idx}_V`);
-          if (lEl.value === '' || vEl.value === '') {
-            lEl.classList.add('error');
-            vEl.classList.add('error');
-            missing++;
-          }
-        });
+  clearErrors();
+
+  let missing = 0;
+
+  for (const letra in grupos) {
+
+    GROUP_FIXTURES[letra].forEach((match, idx) => {
+
+      const lEl =
+        document.getElementById(
+          `g_${letra}_${idx}_L`
+        );
+
+      const vEl =
+        document.getElementById(
+          `g_${letra}_${idx}_V`
+        );
+
+      if (
+        lEl.value === '' ||
+        vEl.value === ''
+      ) {
+
+        lEl.classList.add('error');
+        vEl.classList.add('error');
+
+        missing++;
+
       }
 
-      if (missing > 0) {
-        showToast(`⚠️ Faltan ${missing} resultados en fase de grupos.`);
-        document.querySelector('.error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return false;
-      }
-      return true;
-    }
+    });
 
+  }
+
+  if (missing > 0) {
+
+    showToast(
+      `⚠️ Faltan ${missing} resultados en fase de grupos.`
+    );
+
+    return false;
+
+  }
+
+  return true;
+
+}
+    
     function validateKnockoutRound(ids, roundName) {
       clearErrors();
       let hasError = false;
@@ -782,21 +869,45 @@
     function buildPronosticoObjeto() {
       const pronosticos = [];
 
-      for (const letra in grupos) {
-        GROUP_FIXTURES[group].forEach((match,index)=>{
-          const idPartido = `G_${letra}_${idx + 1}`;
-          pronosticos.push({
-            idPartido,
-            fase: `Grupo ${letra}`,
-            local: normalizeText(grupos[letra][p[0]]),
-            visitante: normalizeText(grupos[letra][p[1]]),
-            gLocal: getFormValue(`g_${letra}_${idx}_L`),
-            gVisitante: getFormValue(`g_${letra}_${idx}_V`),
-            ganadorPenales: ''
-          });
-        });
-      }
+    for (const letra in grupos) {
 
+  GROUP_FIXTURES[letra].forEach((match, idx) => {
+
+    const local = match[0];
+    const visitante = match[1];
+
+    pronosticos.push({
+
+      idPartido:
+        `G_${letra}_${idx + 1}`,
+
+      fase:
+        `Grupo ${letra}`,
+
+      local:
+        normalizeText(local),
+
+      visitante:
+        normalizeText(visitante),
+
+      gLocal:
+        getFormValue(
+          `g_${letra}_${idx}_L`
+        ),
+
+      gVisitante:
+        getFormValue(
+          `g_${letra}_${idx}_V`
+        ),
+
+      ganadorPenales: ''
+
+    });
+
+  });
+
+}
+  
       const fases = [
         { nombre: 'Dieciseisavos', matches: matchStructure.r32 },
         { nombre: 'Octavos', matches: matchStructure.r16 },

@@ -230,18 +230,18 @@
     const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbw7Sp4J5phLsbuDaOfZgyvPixtbStMhNITeEr9IoKct-ZLpGGDzUEOJMacVjHiKjUb_Kw/exec';
 
     const grupos = {
-      A: ['México','Sudáfrica','Corea del Sur','Chequia']
+      A: ['México','Sudáfrica','Corea del Sur','Chequia'],
       B: ['Canadá','Bosnia','Catar','Suiza'],
       C: ['Brasil','Marruecos','Haití','Escocia'],
-     D: ['Estados Unidos','Paraguay','Australia','Turquía']
-     E: ['Alemania','Curazao','Costa de Marfil','Ecuador']
+     D: ['Estados Unidos','Paraguay','Australia','Turquía'],
+     E: ['Alemania','Curazao','Costa de Marfil','Ecuador'],
       F: ['Países Bajos','Japón','Suecia','Túnez'],
-      G: ['Bélgica','Egipto','Irán','Nueva Zelanda']
-     H: ['España','Cabo Verde','Arabia Saudita','Uruguay']
+      G: ['Bélgica','Egipto','Irán','Nueva Zelanda'],
+     H: ['España','Cabo Verde','Arabia Saudita','Uruguay'],
       I: ['Francia','Senegal','Irak','Noruega'],
       J: ['Argentina','Argelia','Austria','Jordania'],
-     K: ['Portugal','RD Congo','Uzbekistán','Colombia']
-      L: ['Inglaterra','Croacia','Ghana','Panamá']
+     K: ['Portugal','RD Congo','Uzbekistán','Colombia'],
+      L: ['Inglaterra','Croacia','Ghana','Panamá'],
     };
 
     const GROUP_FIXTURES = {
@@ -1098,7 +1098,10 @@ function descargarPronostico() {
     Object.keys(penaltyWinners).forEach(key => {
       delete penaltyWinners[key];
     });
-
+   
+    sessionStorage.removeItem(
+  'quiniela_registrada'
+);
     location.reload();
 
   }
@@ -1140,17 +1143,49 @@ function loadProgress() {
 
   });
 
-  if (data.penaltyWinners) {
+if (data.penaltyWinners) {
 
-    Object.keys(data.penaltyWinners)
-      .forEach(key => {
+  Object.keys(data.penaltyWinners)
+    .forEach(key => {
 
-        penaltyWinners[key] =
-          data.penaltyWinners[key];
+      penaltyWinners[key] =
+        data.penaltyWinners[key];
+
+    });
+
+  setTimeout(() => {
+
+    Object.keys(penaltyWinners)
+      .forEach(id => {
+
+        const ganador =
+          penaltyWinners[id];
+
+        const btn1 =
+          document.getElementById(`${id}_pen_t1`);
+
+        const btn2 =
+          document.getElementById(`${id}_pen_t2`);
+
+        if (!btn1 || !btn2) return;
+
+        if (ganador === getTeamName(id, 1)) {
+
+          btn1.classList.add('selected');
+
+        } else {
+
+          btn2.classList.add('selected');
+
+        }
+
+        updateBanner(id);
 
       });
 
-  }
+  }, 500);
+
+}
 }
 
     function updateProgressBar() {
@@ -1174,36 +1209,6 @@ function loadProgress() {
 loadProgress();
 
 calcGroupStandings();
-
-renderKnockoutRound(
-  'r32',
-  'r32-bracket'
-);
-
-renderKnockoutRound(
-  'r16',
-  'r16-bracket'
-);
-
-renderKnockoutRound(
-  'qf',
-  'qf-bracket'
-);
-
-renderKnockoutRound(
-  'sf',
-  'sf-bracket'
-);
-
-renderKnockoutRound(
-  'tp',
-  'tp-bracket'
-);
-
-renderKnockoutRound(
-  'fin',
-  'final-bracket'
-);
 
 Object.keys(penaltyWinners)
   .forEach(id => {

@@ -546,36 +546,83 @@
 
   top8Thirds = allThirds.slice(0, 8);
 
-  console.log(
-  'TOP 8 TERCEROS',
-  top8Thirds
-);
  mappingUsed = getMapping();
 
 }
     
-    function resolveTeam(code) {
-      if (/^[12][A-L]$/.test(code)) {
-        const pos = parseInt(code[0], 10) - 1;
-        const grp = code[1];
-        return { name: groupStandings[grp]?.[pos]?.team || '???', sub: `${code[0]}° Gr.${grp}` };
-      }
+function resolveTeam(code) {
 
-      if (/^3[A-L]$/.test(code)) {
-        const originGroup = mappingUsed[`1${code[1]}`];
-        const teamObj = top8Thirds.find(t => t.group === originGroup);
-        return { name: teamObj ? teamObj.team : '???', sub: `3° Gr.${originGroup || '?'}` };
-      }
+  if (/^[12][A-L]$/.test(code)) {
 
-      if (code.startsWith('W') || code.startsWith('L')) {
-        const isWinner = code.startsWith('W');
-        const mId = 'm' + code.substring(1);
-        const res = isWinner ? getMatchWinner(mId) : getMatchLoser(mId);
-        return { name: res || (isWinner ? `Gan. ${code.substring(1)}` : `Perd. ${code.substring(1)}`), sub: '' };
-      }
+    const pos =
+      parseInt(code[0], 10) - 1;
 
-      return { name: '???', sub: '' };
-    }
+    const grp =
+      code[1];
+
+    return {
+      name:
+        groupStandings[grp]?.[pos]?.team || '???',
+      sub:
+        `${code[0]}° Gr.${grp}`
+    };
+
+  }
+
+  if (/^3[A-L]$/.test(code)) {
+
+    const index =
+      mappingUsed[`1${code[1]}`];
+
+    const teamObj =
+      top8Thirds[index];
+
+    return {
+      name:
+        teamObj
+          ? teamObj.team
+          : '???',
+
+      sub:
+        teamObj
+          ? `3° Mejor (${index + 1})`
+          : ''
+    };
+
+  }
+
+  if (code.startsWith('W') || code.startsWith('L')) {
+
+    const isWinner =
+      code.startsWith('W');
+
+    const mId =
+      'm' + code.substring(1);
+
+    const res =
+      isWinner
+        ? getMatchWinner(mId)
+        : getMatchLoser(mId);
+
+    return {
+      name:
+        res ||
+        (
+          isWinner
+            ? `Gan. ${code.substring(1)}`
+            : `Perd. ${code.substring(1)}`
+        ),
+      sub: ''
+    };
+
+  }
+
+  return {
+    name: '???',
+    sub: ''
+  };
+
+}
 
     function buildMatchCard(id, label, team1, sub1, team2, sub2) {
       const s1 = sub1 ? ` <span style="font-size:0.68rem;color:#888;font-weight:400">${sub1}</span>` : '';
